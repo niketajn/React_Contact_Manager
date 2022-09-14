@@ -4,6 +4,7 @@ import ContactList from './ContactList';
 import AddContact from './AddContact';
 import React, { useState, useEffect} from 'react';
 import { v4 as uuid } from 'uuid';
+import {BrowserRouter, Routes, Route} from 'react-router-dom';
 
 function App() {
   const LOCAL_STOARGE_KEY = "contacts";
@@ -33,10 +34,20 @@ function App() {
 
   return (
     <div className="ui container">
+      
       <Header/>
-      <AddContact addContactHandler={ addContactHandler }/>
-      <ContactList contacts={contacts} getContactID={removeContactHandler}/>
-    </div>
+      
+        {/*<AddContact addContactHandler={ addContactHandler }/>*/}
+      <BrowserRouter>
+      <Routes>
+        <Route exact path="/" element={<ContactList/>}></Route>
+        <Route exact path="/add" element={<AddContact/>}></Route>
+      </Routes>
+      </BrowserRouter>
+      
+        {/*<ContactList contacts={contacts} getContactID={removeContactHandler}/>*/}
+      
+      </div>
   );
 }
 
