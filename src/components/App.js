@@ -5,6 +5,8 @@ import AddContact from './AddContact';
 import React, { useState, useEffect} from 'react';
 import { v4 as uuid } from 'uuid';
 import {BrowserRouter, Routes, Route} from 'react-router-dom';
+import CardDetail from './ContactDetail';
+import ContactDetail from './ContactDetail';
 
 function App() {
   const LOCAL_STOARGE_KEY = "contacts";
@@ -52,6 +54,12 @@ function App() {
           path="/add"
           element={
             <AddContact addContactHandler={ addContactHandler}/>
+          }
+          />
+
+          <Route 
+            path="/contact/:id" 
+            element={<ContactDetail/>
           }
           />
       </Routes>
