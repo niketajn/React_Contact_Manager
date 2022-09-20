@@ -39,7 +39,6 @@ function App() {
       <Header/>
       <Routes>
         <Route 
-          
           path="/"
           element={
              <ContactList 
@@ -50,7 +49,6 @@ function App() {
           />
         
         <Route 
-          
           path="/add"
           element={
             <AddContact addContactHandler={ addContactHandler}/>
