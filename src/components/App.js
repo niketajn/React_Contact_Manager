@@ -5,13 +5,18 @@ import AddContact from './AddContact';
 import React, { useState, useEffect} from 'react';
 import { v4 as uuid } from 'uuid';
 import {BrowserRouter, Routes, Route} from 'react-router-dom';
-import CardDetail from './ContactDetail';
 import ContactDetail from './ContactDetail';
+import api from '../api/contacts';
 
 function App() {
   const LOCAL_STOARGE_KEY = "contacts";
   const [contacts,setContacts] = useState(JSON.parse(localStorage.getItem(LOCAL_STOARGE_KEY)) ?? []);
 
+  //retrive contacts
+  const retriveContacts = async () => {
+    const response = await api.get("/contacts");
+    return response.data;
+  }
   const addContactHandler = (contact) => {    
     const uniqueID = uuid().slice(0,8);
     setContacts([...contacts, {...contact,id:uniqueID}])
@@ -26,12 +31,17 @@ function App() {
   }
 
   useEffect(()=>{
-    const retriveContacts = JSON.parse(localStorage.getItem(LOCAL_STOARGE_KEY));
-    if(retriveContacts) setContacts(retriveContacts);
+   // const retriveContacts = JSON.parse(localStorage.getItem(LOCAL_STOARGE_KEY));
+   // if(retriveContacts) setContacts(retriveContacts);
+   const getAllContacts = async() => {
+    const allContacts = await retriveContacts();
+    if(allContacts) setContacts(allContacts);
+   }
+   getAllContacts();
   },[]);//dependency
 
   useEffect(()=>{
-    localStorage.setItem(LOCAL_STOARGE_KEY,JSON.stringify(contacts));
+    //localStorage.setItem(LOCAL_STOARGE_KEY,JSON.stringify(contacts));
   },[contacts]);//dependency
 
   return (
