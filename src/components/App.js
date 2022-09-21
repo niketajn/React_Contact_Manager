@@ -7,27 +7,44 @@ import { v4 as uuid } from 'uuid';
 import {BrowserRouter, Routes, Route} from 'react-router-dom';
 import ContactDetail from './ContactDetail';
 import api from '../api/contacts';
+import EditContact from './EditContact';
 
 function App() {
   const LOCAL_STOARGE_KEY = "contacts";
-  const [contacts,setContacts] = useState(JSON.parse(localStorage.getItem(LOCAL_STOARGE_KEY)) ?? []);
-
+  //const [contacts,setContacts] = useState(JSON.parse(localStorage.getItem(LOCAL_STOARGE_KEY)) ?? []);
+  const [contacts,setContacts] = useState([]);
+  const [searchItem,setSearchItem] = useState("");
+  const [searchResults,setSearchResults] = useState([]);
   //retrive contacts
   const retriveContacts = async () => {
     const response = await api.get("/contacts");
     return response.data;
   }
-  const addContactHandler = (contact) => {    
-    const uniqueID = uuid().slice(0,8);
-    setContacts([...contacts, {...contact,id:uniqueID}])
+  const addContactHandler = async(contact) => {    
+    const request = {
+      ...contact,
+      id: uuid().slice(0,8)
+    }
+    const response = await api.post("/contacts",request)
+    setContacts([...contacts, response.data]);
   }
 
-  const removeContactHandler = (id) => {
+  const updateContactHandler = async(contact) => {    
+    const response = await api.put(`/contacts/${contact.id}`,contact);
+    const {id, name, email } = response.data;
+    setContacts(
+      contacts.map((contact) => {
+        return contact.id === id ? {...response.data } : contact;
+      })
+    );
+  }
+
+  const removeContactHandler = async (id) => {
+    await api.delete(`/contacts/${id}`);
     const newContactList = contacts.filter((contact) => {
       return contact.id !== id;
     });
     setContacts(newContactList);
-    console.log(newContactList);
   }
 
   useEffect(()=>{
@@ -44,6 +61,21 @@ function App() {
     //localStorage.setItem(LOCAL_STOARGE_KEY,JSON.stringify(contacts));
   },[contacts]);//dependency
 
+  const searchHandler = (value) =>{
+    setSearchItem(value);
+    if(value !== "" ){
+      const newContactList = contacts.filter((contact)=>{
+        return Object.values(contact)
+        .join(" ")
+        .toLowerCase()
+        .includes(searchItem.toLowerCase());
+      })
+      setSearchResults(newContactList);
+    }else{
+      setSearchResults(contacts);
+    }
+  };
+
   return (
     <div className="ui container">
         {/*<AddContact addContactHandler={ addContactHandler }/>*/}
@@ -54,8 +86,10 @@ function App() {
           path="/"
           element={
              <ContactList 
-              contacts={contacts} 
+              contacts={searchItem.length <1 ? contacts : searchResults} 
               getContactID={removeContactHandler}
+              item={searchItem}
+              searchKeyword = {searchHandler}
               />
             }
           />
@@ -72,6 +106,12 @@ function App() {
             element={<ContactDetail/>
           }
           />
+
+          <Route
+            path="/edit/:id"
+            element={<EditContact updateContactHandler={ updateContactHandler}/>}
+          />
+
       </Routes>
       </BrowserRouter>
       

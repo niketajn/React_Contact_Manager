@@ -5,8 +5,12 @@ const ContactCard = (props) => {
     const {id,name,email} = props.contact;
     const navigate = useNavigate();
 
-    const renderComponent = () => {
+    const renderComponent = (str) => {
+        if(str==='details'){
         navigate(`/contact/${id}`,{state:{contact:props.contact}})
+        }else{
+            navigate(`/edit/${id}`,{state:{contact:props.contact}})
+        }
     }
 
     return (
@@ -14,7 +18,7 @@ const ContactCard = (props) => {
         <img className="ui avatar image" src={user}
         alt="user/"/>
                 <div className="content">
-                    <a href="javascript:void(0)" onClick={()=>{renderComponent()}}>
+                    <a href="javascript:void(0)" onClick={()=>{renderComponent('details')}}>
                     <div className="header">
                         {name}
                     </div>
@@ -25,6 +29,10 @@ const ContactCard = (props) => {
                 </div>
                 <i className="trash alternate outline icon"
                 style={{color:"red",marginTop:"7px",float:"right"}} onClick={()=>props.clickHandler(id)}></i>
+                <a href="javascript:void(0)" onClick={()=>{renderComponent('edit')}}>
+                <i className="edit alternate outline icon"
+                style={{color:"blue",marginTop:"7px",float:"right",marginLeft:"10px"}}></i>
+                </a>
             </div>
     );
 }
